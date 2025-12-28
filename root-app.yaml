@@ -11,9 +11,9 @@ spec:
   
   # Points to this repository's argocd-apps folder
   source:
-    repoURL: https://github.com/Himansri21/GCP-cluster-terraform
+    repoURL: https://github.com/Himansri21/Argocd-Gitops
     targetRevision: main
-    path: argocd-apps
+    path: .
     directory:
       recurse: false  # Don't recurse into subdirectories
       include: '{argocd-app.yaml,website-app.yaml}'  # Only these files
