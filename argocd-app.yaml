@@ -1,0 +1,79 @@
+# argocd-apps/argocd-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  source:
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-cd
+    targetRevision: 7.7.11
+    helm:
+      values: |
+        global:
+          domain: argocd.yourdomain.com
+
+        server:
+          replicas: 2
+          service:
+            type: LoadBalancer
+          
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+
+        controller:
+          replicas: 1
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+
+        repoServer:
+          replicas: 2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+
+        redis:
+          enabled: true
+
+        configs:
+          params:
+            server.insecure: false
+          
+          repositories:
+            # Infrastructure repo (this repo)
+            - url: https://github.com/Himansri21/GCP-cluster-terraform
+              type: git
+            
+            # Website/Application repo (your other repo)
+            - url: https://github.com/Himansri21/your-website-repo
+              type: git
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

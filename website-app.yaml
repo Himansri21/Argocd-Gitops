@@ -1,0 +1,63 @@
+# argocd-apps/website-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-website
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  source:
+    # Your website repository (different repo)
+    repoURL: https://github.com/Himansri21/your-website-repo
+    targetRevision: main
+    path: k8s  # or helm-chart, or manifests - wherever your K8s configs are
+    
+    # If using Helm
+    helm:
+      valueFiles:
+        - values.yaml
+      # Or inline values
+      values: |
+        image:
+          repository: gcr.io/your-project/website
+          tag: latest
+        
+        service:
+          type: LoadBalancer
+          port: 80
+        
+        ingress:
+          enabled: true
+          className: nginx
+          hosts:
+            - host: www.yourdomain.com
+              paths:
+                - path: /
+                  pathType: Prefix
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: website  # Your website namespace
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Health checks
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
