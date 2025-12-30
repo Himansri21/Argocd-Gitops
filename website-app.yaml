@@ -12,7 +12,7 @@ spec:
   source:
     # Your website repository (different repo)
     repoURL: https://github.com/Himansri21/your-website-repo
-    targetRevision: main
+    targetRevision: master
     path: k8s  # or helm-chart, or manifests - wherever your K8s configs are
     
     # If using Helm
