@@ -10,7 +10,7 @@ spec:
   project: default
   
   source:
-    repoURL: https://github.com/Himansri21/Himansri21.github.io  # ← Your actual repo name
+    repoURL: https://github.com/Himansri21/gitops # ← Your actual repo name
     targetRevision: main
     path: k8s
   
