@@ -1,8 +1,8 @@
-# argocd-apps/website-app.yaml
+# Argocd-apps/website-app.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: my-website
+  name: portfolio
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,37 +10,13 @@ spec:
   project: default
   
   source:
-    # Your website repository (different repo)
-    repoURL: https://github.com/Himansri21/your-website-repo
-    targetRevision: master
-    path: k8s  # or helm-chart, or manifests - wherever your K8s configs are
-    
-    # If using Helm
-    helm:
-      valueFiles:
-        - values.yaml
-      # Or inline values
-      values: |
-        image:
-          repository: gcr.io/your-project/website
-          tag: latest
-        
-        service:
-          type: LoadBalancer
-          port: 80
-        
-        ingress:
-          enabled: true
-          className: nginx
-          hosts:
-            - host: www.yourdomain.com
-              paths:
-                - path: /
-                  pathType: Prefix
+    repoURL: https://github.com/Himansri21/Himansri21.github.io  # ← Your actual repo name
+    targetRevision: main
+    path: k8s
   
   destination:
     server: https://kubernetes.default.svc
-    namespace: website  # Your website namespace
+    namespace: website
   
   syncPolicy:
     automated:
@@ -48,6 +24,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
     retry:
       limit: 5
       backoff:
@@ -55,9 +32,9 @@ spec:
         factor: 2
         maxDuration: 3m
 
-  # Health checks
+  # Watch for image changes
   ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      jsonPointers:
-        - /spec/replicas
+  - group: apps
+    kind: Deployment
+    jsonPointers:
+    - /spec/template/spec/containers/0/image
