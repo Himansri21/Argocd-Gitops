@@ -8,24 +8,17 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  
-  # Points to this repository's argocd-apps folder
   source:
     repoURL: https://github.com/Himansri21/Argocd-Gitops
     targetRevision: main
     path: .
     directory:
-      recurse: false  # Don't recurse into subdirectories
-      include: '{website-app.yaml}'  # Only these files
-  
+      recurse: false
+      include: 'website-app.yaml'
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-  
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-      allowEmpty: false
-    syncOptions:
-      - CreateNamespace=true
